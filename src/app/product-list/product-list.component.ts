@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {Product} from "../product";
 import {ProductService} from "../product.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-product-list',
@@ -13,13 +14,16 @@ export class ProductListComponent {
    * Inyectamos el servicio ProductService mediante el constructor.
    * @param productService - Servicio para obtener los datos de productos.
    */
-  constructor(private productService: ProductService ) {}
+  constructor(private productService: ProductService, private router: Router) {
+  }
+
   /**
    * Método del ciclo de vida de Angular que se ejecuta al inicializar el componente.
    */
   ngOnInit(): void {
     this.getProducts(); // Llamamos al método para cargar los productos
   }
+
   /**
    * Método para obtener los productos desde el servicio.
    * Suscribe al observable y actualiza la lista de productos.
@@ -29,6 +33,17 @@ export class ProductListComponent {
     this.productService.getAllProducts().subscribe(
       (products: Product[]) => {
         this.products = products;
+      }
+    );
+  }
+  editProduct(idProduct: number) {
+    this.router.navigate(['edit-product', idProduct]);
+  }
+  deleteProduct(idProduct: number) {
+    this.productService.deleteProduct(idProduct).subscribe(
+      {
+        next: (data) => this.getProducts(),
+        error: (error) => console.log(error)
       }
     );
   }
